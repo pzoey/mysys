@@ -388,3 +388,18 @@ spring.ai.mcp:
             - -y
             - '@modelcontextprotocol/server-filesystem'
             - D:/data
+
+--- # 钉钉通讯录同步。client-id / client-secret 留空时回退 justauth.type.dingtalk，不要填写真实 AppSecret
+dingtalk:
+  client-id:
+  client-secret:
+  api-base-url: https://oapi.dingtalk.com
+  sync:
+    # 两次请求的最小间隔，毫秒
+    min-interval-ms: 100
+    user-page-size: 100
+    retry-delay-ms: 300
+    # 钉钉根部门挂到哪个本地部门。不填则挂到 parent_id=0 的根部门下面，并为钉钉根部门单独建部门
+    # anchor-dept-id:
+    # 只对本次新建的用户授予该角色，不会授予超级管理员
+    # default-role-id:

@@ -1351,3 +1351,46 @@ begin
 execute immediate 'alter session set nls_date_format=''YYYY-MM-DD HH24:MI:SS''';
 end;
 
+
+-- 钉钉部门映射、同步批次
+create table sys_dingtalk_dept (
+    id              number(20)      not null,
+    dept_id         number(20)      not null,
+    ding_dept_id    number(20)      not null,
+    ding_parent_id  number(20)      default null,
+    create_dept     number(20)      default null,
+    create_by       number(20)      default null,
+    create_time     date,
+    update_by       number(20)      default null,
+    update_time     date
+);
+alter table sys_dingtalk_dept add constraint pk_sys_dingtalk_dept primary key (id);
+create unique index uk_sys_dingtalk_dept_ding on sys_dingtalk_dept (ding_dept_id);
+create unique index uk_sys_dingtalk_dept_local on sys_dingtalk_dept (dept_id);
+comment on table sys_dingtalk_dept is '钉钉部门与本地部门映射';
+
+create table sys_dingtalk_sync_log (
+    id              number(20)      not null,
+    batch_no        varchar2(32)    not null,
+    status          char(1)         not null,
+    dept_success    number(10)      default 0,
+    dept_fail       number(10)      default 0,
+    user_success    number(10)      default 0,
+    user_fail       number(10)      default 0,
+    user_skip       number(10)      default 0,
+    summary         varchar2(500)   default null,
+    fail_detail     varchar2(2000)  default null,
+    start_time      date,
+    finish_time     date,
+    create_dept     number(20)      default null,
+    create_by       number(20)      default null,
+    create_time     date,
+    update_by       number(20)      default null,
+    update_time     date
+);
+alter table sys_dingtalk_sync_log add constraint pk_sys_dingtalk_sync_log primary key (id);
+comment on table sys_dingtalk_sync_log is '钉钉组织同步批次';
+comment on column sys_dingtalk_sync_log.status is '状态（0进行中 1成功 2部分失败 3失败）';
+
+insert into sys_menu values(1761400000000000140, '钉钉组织同步', 1761400000000000001, 12, 'dingtalk', 'system/dingtalk/index', '', 'N', 'Y', 'C', '0', '0', 'system:dingtalk:query', 'international', '', '', 1761000000000000103, 1761100000000000001, sysdate, null, null, '从钉钉全量同步部门与人员');
+insert into sys_menu values(1761400000000000141, '钉钉同步', 1761400000000000140, 1, '', '', '', 'N', 'Y', 'F', '0', '0', 'system:dingtalk:sync', '#', '', '', 1761000000000000103, 1761100000000000001, sysdate, null, null, '');

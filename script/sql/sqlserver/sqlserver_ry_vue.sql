@@ -3471,3 +3471,52 @@ GO
 INSERT test_tree VALUES (1762200000000000013, 1762200000000000010, 1761000000000000108, 1761100000000000003, N'子节点99', 0, 1761000000000000103, getdate(), 1761100000000000001, NULL, NULL, 0);
 GO
 
+
+CREATE TABLE sys_dingtalk_dept (
+    id              bigint          NOT NULL,
+    dept_id         bigint          NOT NULL,
+    ding_dept_id    bigint          NOT NULL,
+    ding_parent_id  bigint          NULL,
+    create_dept     bigint          NULL,
+    create_by       bigint          NULL,
+    create_time     datetime2(7)    NULL,
+    update_by       bigint          NULL,
+    update_time     datetime2(7)    NULL,
+    CONSTRAINT PK_sys_dingtalk_dept PRIMARY KEY CLUSTERED (id),
+    CONSTRAINT UK_sys_dingtalk_dept_ding UNIQUE (ding_dept_id),
+    CONSTRAINT UK_sys_dingtalk_dept_local UNIQUE (dept_id)
+);
+GO
+EXEC sys.sp_addextendedproperty 'MS_Description', N'钉钉部门与本地部门映射', 'SCHEMA', N'dbo', 'TABLE', N'sys_dingtalk_dept';
+GO
+
+CREATE TABLE sys_dingtalk_sync_log (
+    id              bigint          NOT NULL,
+    batch_no        nvarchar(32)    NOT NULL,
+    status          nchar(1)        NOT NULL,
+    dept_success    int             DEFAULT 0 NULL,
+    dept_fail       int             DEFAULT 0 NULL,
+    user_success    int             DEFAULT 0 NULL,
+    user_fail       int             DEFAULT 0 NULL,
+    user_skip       int             DEFAULT 0 NULL,
+    summary         nvarchar(500)   NULL,
+    fail_detail     nvarchar(2000)  NULL,
+    start_time      datetime2(7)    NULL,
+    finish_time     datetime2(7)    NULL,
+    create_dept     bigint          NULL,
+    create_by       bigint          NULL,
+    create_time     datetime2(7)    NULL,
+    update_by       bigint          NULL,
+    update_time     datetime2(7)    NULL,
+    CONSTRAINT PK_sys_dingtalk_sync_log PRIMARY KEY CLUSTERED (id)
+);
+GO
+EXEC sys.sp_addextendedproperty 'MS_Description', N'钉钉组织同步批次', 'SCHEMA', N'dbo', 'TABLE', N'sys_dingtalk_sync_log';
+GO
+EXEC sys.sp_addextendedproperty 'MS_Description', N'状态（0进行中 1成功 2部分失败 3失败）', 'SCHEMA', N'dbo', 'TABLE', N'sys_dingtalk_sync_log', 'COLUMN', N'status';
+GO
+
+insert into sys_menu values(1761400000000000140, N'钉钉组织同步', 1761400000000000001, 12, N'dingtalk', N'system/dingtalk/index', N'', N'N', N'Y', N'C', N'0', N'0', N'system:dingtalk:query', N'international', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'从钉钉全量同步部门与人员');
+GO
+insert into sys_menu values(1761400000000000141, N'钉钉同步', 1761400000000000140, 1, N'', N'', N'', N'N', N'Y', N'F', N'0', N'0', N'system:dingtalk:sync', N'#', N'', N'', 1761000000000000103, 1761100000000000001, getdate(), NULL, NULL, N'');
+GO
